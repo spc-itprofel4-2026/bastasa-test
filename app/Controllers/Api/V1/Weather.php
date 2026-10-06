@@ -40,10 +40,11 @@ class Weather extends BaseController
         ]);
     }
 
-    // GET /api/v1/weather/logs?limit=10
+    // GET /api/v1/weather/logs?limit=10&format=json
     public function logs()
     {
-        $limit = $this->request->getGet('limit') ?? '10';
+        $limit  = $this->request->getGet('limit') ?? '10';
+        $format = $this->request->getGet('format') ?? 'json';
 
         $limitIsValid = is_string($limit) && ctype_digit($limit)
             && (int) $limit >= 1 && (int) $limit <= 50;
@@ -52,8 +53,16 @@ class Weather extends BaseController
             return $this->errorResponse(422, 'invalid_limit', 'limit must be 1 to 50.');
         }
 
+        if (! in_array($format, ['json', 'xml'], true)) {
+            return $this->errorResponse(422, 'invalid_format', 'format must be json or xml.');
+        }
+
         $rows  = (new WeatherLogModel())->orderBy('id', 'DESC')->findAll((int) $limit);
         $items = array_map(fn ($row) => $this->formatRow($row), $rows);
+
+        if ($format === 'xml') {
+            return $this->xmlResponse($items);
+        }
 
         return $this->response->setStatusCode(200)->setJSON([
             'status' => 200,
@@ -74,6 +83,41 @@ class Weather extends BaseController
             'status' => 200,
             'data'   => $this->formatRow($row),
         ]);
+    }
+
+    // Build the XML, check it against the schema, then send it.
+    private function xmlResponse(array $items)
+    {
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true;
+
+        $root = $dom->createElement('weatherReport');
+        $dom->appendChild($root);
+
+        foreach ($items as $item) {
+            $reading = $dom->createElement('reading');
+
+            foreach (['id', 'city', 'temperatureC', 'fetchedAt'] as $field) {
+                $node = $dom->createElement($field);
+                $node->appendChild($dom->createTextNode((string) $item[$field]));
+                $reading->appendChild($node);
+            }
+
+            $root->appendChild($reading);
+        }
+
+        libxml_use_internal_errors(true);
+        $isValid = $dom->schemaValidate(APPPATH . 'Schemas/weather-report.xsd');
+        libxml_clear_errors();
+
+        if (! $isValid) {
+            return $this->errorResponse(500, 'invalid_xml', 'XML did not match the schema.');
+        }
+
+        return $this->response
+            ->setStatusCode(200)
+            ->setContentType('application/xml')
+            ->setBody($dom->saveXML());
     }
 
     // Same error shape for every error.
