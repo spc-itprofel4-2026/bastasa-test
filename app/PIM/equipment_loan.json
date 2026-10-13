@@ -1,0 +1,11 @@
+{
+  "entity": "EquipmentLoan",
+  "fields": [
+    { "name": "borrowerName", "type": "text", "required": true },
+    { "name": "equipmentName", "type": "text", "required": true },
+    { "name": "daysBorrowed", "type": "wholenumber", "required": true },
+    { "name": "depositAmount", "type": "decimal", "required": true },
+    { "name": "isReturned", "type": "yesno", "required": false },
+    { "name": "borrowedOn", "type": "date", "required": true }
+  ]
+}
