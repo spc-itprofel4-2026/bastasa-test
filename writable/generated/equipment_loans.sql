@@ -1,7 +1,7 @@
 CREATE TABLE equipment_loans (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    borrower_name VARCHAR(100) NOT NULL,
-    equipment_name VARCHAR(100) NOT NULL,
+    borrower_name VARCHAR(255) NOT NULL,
+    equipment_name VARCHAR(255) NOT NULL,
     days_borrowed INT NOT NULL,
     deposit_amount DECIMAL(10,2) NOT NULL,
     is_returned TINYINT(1),
