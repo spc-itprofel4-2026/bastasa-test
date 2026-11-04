@@ -1,0 +1,9 @@
+{
+  "entity": "EquipmentLoan",
+  "marks": [
+    { "target": "EquipmentLoan", "mark": "tableName", "value": "school_equipment_loans" },
+    { "target": "equipmentName", "mark": "unique", "value": true },
+    { "target": "borrowerName", "mark": "size", "value": 60 },
+    { "target": "equipmentName", "mark": "size", "value": 40 }
+  ]
+}

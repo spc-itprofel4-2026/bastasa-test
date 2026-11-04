@@ -1,0 +1,9 @@
+{
+  "entity": "EquipmentLoan",
+  "marks": [
+    { "target": "EquipmentLoan", "mark": "tableName", "value": "counter_equipment_loans" },
+    { "target": "borrowerName", "mark": "unique", "value": true },
+    { "target": "borrowerName", "mark": "size", "value": 30 },
+    { "target": "equipmentName", "mark": "size", "value": 25 }
+  ]
+}
